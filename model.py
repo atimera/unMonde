@@ -1,6 +1,10 @@
 import json
 import math
 
+#import matplotlib as mil
+#mil.use('TkAgg') # si sous mac
+import matplotlib.pyplot as plt
+
 class Agent:
     """ Représente un agent caractérisé par :
         -
@@ -118,6 +122,10 @@ class Zone:
     def area(self):
         """ Calcule la surface d'une zone : height * width """
         return self.height * self.width
+    
+    def population_density(self):
+        """ Calcule la densité de population d'une zone """
+        return self.population / self.area
 
     def average_agreeableness(self):
         """ Calcule l'agréabilité moyenne d'une zone """
@@ -130,7 +138,42 @@ class Zone:
         return sum([inhabitant.agreeableness for inhabitant in self.inhabitants]) / self.population
 
 
-
+class BaseGraph: # class abstraite
+    """La classe mere d'où vont hérité les classes pour dessiner differents graphes en fontion des besoins """
+    def __init__(self):
+        self.title = "Your graph title" # le titre du graph
+        self.x_label = "X-axis label" #abscisse
+        self.y_label = "Y-axis label" #ordonnée
+        self.show_grid = True # avec une grille de fond ou pas True si oui
+    
+    def show(self, zones):
+        """Affiche le graphe """
+        x_values, y_values = self.xy_values(zones)
+        plt.plot(x_values, y_values, ".") # '.' pour dire le type de graph est des points
+        plt.xlabel(self.x_label) # affiche le label des abscisses
+        plt.ylabel(self.y_label) # affiche le label des ordonnées
+        plt.title(self.title) # affiche le titre du graphe
+        plt.grid(self.show_grid) # montre ou non la grille de fond
+        plt.show()
+        
+    def xy_values(self, zones):
+        """ Calcule les valeurs en abscisse et en ordonnée """
+        raise NotImplementedError # Erreur si la class enfant n'implémente pas cette classe
+ 
+        
+class AgreeablenessGraph(BaseGraph): # hérite de BaseGraph
+    """ Pour dessiner notre graph d'agréabilité """
+    def __init__(self):
+        super().__init__() # appel un constructeur de la classe parente Pour récup notamment la valeur par defaut pour la grille de fond
+        self.title = "Nice peple live in the countryside"
+        self.x_label = "population_density"
+        self.y_label = "agreeableness"
+        
+    def xy_values(self, zones):
+        """ Calcule les valeurs en abscisse et en ordonnée """
+        x_values = [zone.population_density() for zone in zones]
+        y_values = [zone.average_agreeableness() for zone in zones]
+        return x_values, y_values 
         
     
 def main():
@@ -143,7 +186,14 @@ def main():
         agent = Agent(position, **agent_attributes)
         zone = Zone.find_zone_that_contains(position)
         zone.add_inhabitant(agent)
-        print(zone.average_agreeableness())
+        
+        
+        #print(zone.average_agreeableness())
+    # Graph initialization
+    agreeableness_graph = AgreeablenessGraph()
+    # Show graph
+    agreeableness_graph.show(Zone.ZONES)
+    
         
 
 main()
