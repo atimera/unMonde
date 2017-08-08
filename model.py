@@ -59,7 +59,7 @@ class Zone:
         self.inhabitants = [] # une zone n'a pas d'habitant par defaut
 
     @classmethod #mehode de class
-    def initialize_zones(cls):
+    def _initialize_zones(cls):
         """Initialise la grille (la zone)"""
         for latitude in range(cls.MIN_LATITUDE_DEGREES, cls.MAX_LATITUDE_DEGREES):
             for longitude in range(cls.MIN_LONGITUDE_DEGREES, cls.MAX_LONGITUDE_DEGREES, cls.WIDTH_DEGREES):
@@ -79,6 +79,8 @@ class Zone:
     @classmethod
     def find_zone_that_contains(cls, position):
         # Compute the index in the ZONES array that contains the given position
+        if not cls.ZONES:
+            cls._initialize_zones()
         longitude_index = int((position.longitude_degrees - cls.MIN_LONGITUDE_DEGREES)/ cls.WIDTH_DEGREES)
         latitude_index = int((position.latitude_degrees - cls.MIN_LATITUDE_DEGREES)/ cls.HEIGHT_DEGREES)
         longitude_bins = int((cls.MAX_LONGITUDE_DEGREES - cls.MIN_LONGITUDE_DEGREES) / cls.WIDTH_DEGREES) # 180-(-180) / 1
@@ -116,9 +118,9 @@ def main():
         longitude = agent_attributes.pop('longitude')
         position = Position(longitude, latitude)
         agent = Agent(position, **agent_attributes)
-        Zone.initialize_zones()
         zone = Zone.find_zone_that_contains(position)
         zone.add_inhabitant(agent)
-        print("Zone population: ", zone.population)
+        print(zone.population)
+        
 
 main()
