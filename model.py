@@ -37,6 +37,38 @@ class Position:
         return self.latitude_degrees * math.pi / 100 """
         return self.latitude_degrees * math.pi / 100
 
+class Zone:
+    """ Représente une zone, caractérisé par :
+        - son coin inferieur gauche
+        - son coin inferieur droit
+        - et ses habitant """
+
+    # les attributs de class
+    ZONES = [] # liste de toute les zones créées de la grille
+    MIN_LONGITUDE_DEGREES =  -180 #longitude minimale
+    MAX_LONGITUDE_DEGREES = 180 #longitude maximale
+    MIN_LATITUDE_DEGREES =  -90 #latitude minimale
+    MAX_LATITUDE_DEGREES = 90 #latitude maximale
+    WIDTH_DEGREES = 1 # l'espacement horizontal
+    HEIGHT_DEGREES = 1 # l'espacement verticale
+
+    def __init__(self, corner1, corner2):
+        """ le constructeur """
+        self.corner1 = corner1
+        self.corner2 = corner2
+        self.inhabitants = 0 # une zone n'a pas d'habitant par defaut
+
+    @classmethod #mehode de class
+    def initialize_zones(cls):
+        """Initialise la grille (la zone)"""
+        for latitude in range(cls.MIN_LATITUDE_DEGREES, cls.MAX_LATITUDE_DEGREES):
+            for longitude in range(cls.MIN_LONGITUDE_DEGREES, cls.MAX_LONGITUDE_DEGREES, cls.WIDTH_DEGREES):
+                bottom_left_corner = Position(longitude, latitude)
+                top_right_corner = Position(longitude + cls.WIDTH_DEGREES, latitude + cls.HEIGHT_DEGREES)
+                zone = Zone(bottom_left_corner, top_right_corner)
+                cls.ZONES.append(zone)
+        print(len(cls.ZONES)) # Affiche le nombre totale de zones 
+    
 def main():
     """Notre fonction main() qui execute toutes les actions de notre programme """
     # Création des instance d'Agents à partir du fichier JSON
@@ -46,7 +78,7 @@ def main():
         position = Position(longitude, latitude)
         
         agent = Agent(position, **agent_attributes)
-        print(agent.position.latitude)
+        Zone.initialize_zones()
         #print(agent.agreeableness)
 
 main()
